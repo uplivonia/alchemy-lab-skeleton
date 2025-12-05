@@ -11,12 +11,27 @@ body {
     margin: 0;
     padding: 0;
     height: 100%;
-}
-
-body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'IM Fell English', Georgia, 'Times New Roman', serif;
     background: radial-gradient(circle at top, #1f2833, #0b0c10 40%);
     color: #e5e5e5;
+    letter-spacing: 0.01em;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: 'Cinzel', 'IM Fell English', serif;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+}
+
+h2 {
+    font-size: 1rem;
+}
+
+h3 {
+    font-size: 0.9rem;
 }
 
 #root {
@@ -35,28 +50,6 @@ body {
     padding: 0.75rem 0.75rem 1rem;
 }
 
-/* ===== Cards / lists / common ===== */
-
-.card {
-    background: rgba(13, 17, 23, 0.9);
-    border-radius: 0.75rem;
-    padding: 0.75rem 0.85rem;
-    border: 1px solid #202634;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-}
-
-.list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-section {
-    margin-top: 0.5rem;
-}
 
 /* ===== HUD (top bar) ===== */
 
@@ -429,4 +422,40 @@ nav {
     .home-quick:active {
         transform: translateY(1px);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+.card {
+    position: relative;
+    background: radial-gradient(circle at top, #f5e6c4 0, #e3cfa3 42%, #d1b37d 100%);
+    color: #2b2415;
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid #b89963;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+    .card h2,
+    .card h3 {
+        color: #2b2415;
+    }
+
+    .card::before,
+    .card::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 10px;
+        background: radial-gradient(circle at center, rgba(0, 0, 0, 0.35), transparent 70%);
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    .card::before {
+        top: -6px;
+    }
+
+    .card::after {
+        bottom: -6px;
     }
