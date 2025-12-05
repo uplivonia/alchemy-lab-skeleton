@@ -1,7 +1,12 @@
-import React, { useState } from 'react'
+﻿import React, { useState } from 'react'
 import { useGameState } from '../game/state'
+import type { TabId } from '../App'
 
-export const HomePage: React.FC = () => {
+interface HomePageProps {
+    onNavigate?: (tab: TabId) => void
+}
+
+export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     const { player, claimDailyReward } = useGameState()
     const [toast, setToast] = useState<string | null>(null)
 
@@ -13,11 +18,13 @@ export const HomePage: React.FC = () => {
         if (!canClaimToday) return
         claimDailyReward()
         setToast('+25 AP, +10 XP')
-
-        window.setTimeout(() => {
-            setToast(null)
-        }, 2200)
+        window.setTimeout(() => setToast(null), 2200)
     }
+
+    const goToQuests = () => onNavigate?.('quests')
+    const goToLab = () => onNavigate?.('lab')
+    const goToRecipes = () => onNavigate?.('recipes')
+    const goToUpgrades = () => onNavigate?.('upgrades')
 
     return (
         <section className="home">
@@ -65,17 +72,36 @@ export const HomePage: React.FC = () => {
                 </div>
             </div>
 
+            {/* две крупные карточки-кнопки */}
             <div className="home-grid">
-                <div className="card">
+                <div
+                    className="card home-card-clickable"
+                    onClick={goToQuests}
+                    role="button"
+                    tabIndex={0}
+                >
                     <h3>Daily goals</h3>
-                    <p>Check the quests tab to see what you can complete today.</p>
+                    <p>Tap to open today&apos;s quests and track your progress.</p>
                 </div>
-                <div className="card">
-                    <h3>Invite alchemists</h3>
-                    <p>
-                        Share your bot link and get unique recipes when friends start their journey.
-                    </p>
+                <div
+                    className="card home-card-clickable"
+                    onClick={goToLab}
+                    role="button"
+                    tabIndex={0}
+                >
+                    <h3>Laboratory</h3>
+                    <p>Go to your lab to upgrade stations and improve your setup.</p>
                 </div>
+            </div>
+
+            {/* маленькие быстрые кнопки под ними */}
+            <div className="home-quick-grid">
+                <button className="home-quick" onClick={goToRecipes}>
+                    🧪 Recipes
+                </button>
+                <button className="home-quick" onClick={goToUpgrades}>
+                    🛠 Upgrades
+                </button>
             </div>
 
             {toast && (
