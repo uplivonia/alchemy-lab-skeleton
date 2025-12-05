@@ -17,11 +17,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     const handleDailyClick = () => {
         if (!canClaimToday) return
         claimDailyReward()
-        setToast('+25 AP, +10 XP')
+        setToast('Night started: +25 coins, +10 XP')
         window.setTimeout(() => setToast(null), 2200)
     }
 
-    const goToQuests = () => onNavigate?.('quests')
+    const goToOrders = () => onNavigate?.('quests')
     const goToLab = () => onNavigate?.('lab')
     const goToRecipes = () => onNavigate?.('recipes')
     const goToUpgrades = () => onNavigate?.('upgrades')
@@ -30,34 +30,38 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         <section className="home">
             <div className="home-hero card">
                 <div className="home-hero-left">
-                    <h2>Welcome, {player.name}</h2>
+                    <h2>Witchy Potion Shop</h2>
                     <p className="home-subtitle">
-                        Rebuild your ruined laboratory, discover secret recipes and become a legendary alchemist.
+                        Welcome, {player.name}! Tonight the Night Market opens again. Serve weird customers,
+                        brew risky potions and grow your cursed little shop.
                     </p>
+
                     <div className="home-stats">
                         <div>
-                            <span className="label">Lab table level</span>
-                            <span className="value">Lv. {player.lab.tableLevel}</span>
+                            <span className="label">Shop rank</span>
+                            <span className="value">Lv. {player.level}</span>
                         </div>
                         <div>
-                            <span className="label">Recipes unlocked</span>
+                            <span className="label">Potions known</span>
                             <span className="value">{player.unlockedRecipeIds.length}</span>
                         </div>
                         <div>
-                            <span className="label">Referrals</span>
+                            <span className="label">Regulars</span>
                             <span className="value">{player.referralCount}</span>
                         </div>
                     </div>
+
                     <div className="home-actions">
                         <button
                             className="btn-primary"
                             onClick={handleDailyClick}
                             disabled={!canClaimToday}
                         >
-                            {canClaimToday ? 'Claim daily reward' : 'Daily reward already claimed'}
+                            {canClaimToday ? 'Open Night Market' : 'Night Market already open'}
                         </button>
                     </div>
                 </div>
+
                 <div className="home-hero-right">
                     <div className="lab-preview">
                         <div className="lab-preview-inner">
@@ -67,7 +71,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                             <div className="lab-bottle lab-bottle-left" />
                             <div className="lab-bottle lab-bottle-right" />
                         </div>
-                        <p className="lab-preview-caption">Your laboratory</p>
+                        <p className="lab-preview-caption">Your cursed little shop</p>
                     </div>
                 </div>
             </div>
@@ -76,12 +80,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             <div className="home-grid">
                 <div
                     className="card home-card-clickable"
-                    onClick={goToQuests}
+                    onClick={goToOrders}
                     role="button"
                     tabIndex={0}
                 >
-                    <h3>Daily goals</h3>
-                    <p>Tap to open today&apos;s quests and track your progress.</p>
+                    <h3>Today's Orders</h3>
+                    <p>Tap to see who is waiting in line and what potions they need tonight.</p>
                 </div>
                 <div
                     className="card home-card-clickable"
@@ -89,18 +93,18 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                     role="button"
                     tabIndex={0}
                 >
-                    <h3>Laboratory</h3>
-                    <p>Go to your lab to upgrade stations and improve your setup.</p>
+                    <h3>Cauldron Room</h3>
+                    <p>Go to the cauldron, adjust the heat and try to hit that perfect brew.</p>
                 </div>
             </div>
 
-            {/* маленькие быстрые кнопки под ними */}
+            {/* быстрые кнопки */}
             <div className="home-quick-grid">
                 <button className="home-quick" onClick={goToRecipes}>
-                    🧪 Recipes
+                    📖 Grimoire
                 </button>
                 <button className="home-quick" onClick={goToUpgrades}>
-                    🛠 Upgrades
+                    🛠 Shop upgrades
                 </button>
             </div>
 

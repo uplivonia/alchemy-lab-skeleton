@@ -16,10 +16,12 @@ export const RecipeList: React.FC<Props> = ({ recipes }) => {
 
     return (
         <section>
-            <h2>Recipes</h2>
+            <h2>Grimoire</h2>
+            <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>
+                All known potions in your spellbook. Choose one to brew it in the Cauldron Room.
+            </p>
             <ul className="list">
                 {recipes.map(recipe => {
-                    // ✅ Правильная версия — boolean 100%
                     const isLockedByLab =
                         recipe.requiredLabLevel !== undefined &&
                         player.lab.tableLevel < recipe.requiredLabLevel
@@ -37,12 +39,12 @@ export const RecipeList: React.FC<Props> = ({ recipes }) => {
 
                             {recipe.requiredLabLevel !== undefined && (
                                 <p style={{ fontSize: '0.75rem', opacity: 0.8 }}>
-                                    Requires lab table level {recipe.requiredLabLevel}
+                                    Requires cauldron level {recipe.requiredLabLevel}
                                 </p>
                             )}
 
                             <p style={{ fontSize: '0.8rem' }}>
-                                Ingredients:{' '}
+                                Ingredients{' '}
                                 {recipe.ingredientIds
                                     .map(id => ingredientById[id]?.name || id)
                                     .join(', ')}
@@ -56,7 +58,7 @@ export const RecipeList: React.FC<Props> = ({ recipes }) => {
                                 disabled={isLockedByLab}
                                 onClick={() => startMiniGameForRecipe(recipe.id)}
                             >
-                                {isLockedByLab ? 'Locked' : 'Brew'}
+                                {isLockedByLab ? 'Locked' : 'Brew for customer'}
                             </button>
                         </li>
                     )
