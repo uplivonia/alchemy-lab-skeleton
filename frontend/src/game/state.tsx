@@ -1,12 +1,13 @@
 ﻿import React, { createContext, useContext, useEffect, useState } from 'react'
 import { PlayerState, MiniGameType } from './types'
-import { defaultPlayerState } from './mockData'
-import { gainXp, grantAlchemyPoints, applyDailyReward, canClaimDailyReward } from './gameLogic'
+import { defaultPlayerState, mockRecipes } from './mockData'
+import { gainXp, grantAlchemyPoints, applyDailyReward } from './gameLogic'
 import { getInitialState, saveState } from '../services/apiClient'
-import { getTelegramUserId, getTelegramUserIdFallback, initTelegram } from '../services/telegram'
-import { mockRecipes } from './mockData'
-
-
+import {
+    getTelegramUserId,
+    getUserIdFromUrl,
+    getLocalFallbackUserId
+} from '../services/telegram'
 
 interface GameStateContextValue {
     player: PlayerState
@@ -23,33 +24,42 @@ const GameStateContext = createContext<GameStateContextValue | undefined>(undefi
 export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [player, setPlayer] = useState<PlayerState>(defaultPlayerState)
     const [isLoaded, setIsLoaded] = useState(false)
+
+    // 1) Telegram ID, 2) ?uid=..., 3) demo-user для браузера
+    const urlId = getUserIdFromUrl()
+    const rawId = getTelegramUserId() ?? urlId
+    const userId = rawId ?? getLocalFallbackUserId()
+
     const claimDailyReward = () => {
         setPlayer(prev => applyDailyReward(prev, new Date()))
     }
 
-    // простой userId – потом можно заменить на реальный из Telegram initData
-    const rawId = getTelegramUserId()
-    const userId = rawId ?? getTelegramUserIdFallback()
-
-    // загрузка стейта с бэкенда при старте
+    // загрузка стейта с бэка
     useEffect(() => {
-        initTelegram()
+        let cancelled = false
+
         getInitialState(userId)
-            .then((state) => {
-                setPlayer(state)
+            .then(state => {
+                if (!cancelled) setPlayer(state)
             })
             .catch(() => {
-                // если бэкенд не отвечает или новый юзер – остаёмся на дефолтном
-                console.warn('Using default player state')
+                if (!cancelled) {
+                    console.warn('Using default player state')
+                }
             })
-            .finally(() => setIsLoaded(true))
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+            .finally(() => {
+                if (!cancelled) setIsLoaded(true)
+            })
 
-    // авто-сохранение на бэкенд при изменении player (после первой загрузки)
+        return () => {
+            cancelled = true
+        }
+    }, [userId])
+
+    // авто-сохранение при изменении
     useEffect(() => {
         if (!isLoaded) return
-        saveState(userId, player).catch((err) => {
+        saveState(userId, player).catch(err => {
             console.error('Failed to save state', err)
         })
     }, [player, isLoaded, userId])
@@ -84,17 +94,14 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                 }
             }
 
-            // базовые значения
             let points = 10
             let xp = 5
 
-            // разная награда в зависимости от типа мини-игры
             const type = prev.miniGame.activeType
             if (type === 'GRIND') {
                 points = 8
                 xp = 4
             } else if (type === 'BREW') {
-                // можно учитывать quality из result.quality
                 if (result.quality === 'high') {
                     points = 20
                     xp = 10
@@ -120,7 +127,7 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
 
     const upgradeStation = (upgradeId: string) => {
-        // пока не смотрим на конкретный upgradeId – просто апаем стол и тратим 50
+        // пока не различаем тип апгрейда, просто повышаем уровень стола
         setPlayer(prev => ({
             ...prev,
             alchemyPoints: Math.max(0, prev.alchemyPoints - 50),
@@ -141,7 +148,6 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
 
     if (!isLoaded) {
-        // простой лоадер, чтобы не моргал дефолтный стейт
         return <div style={{ padding: '1rem' }}>Loading your lab...</div>
     }
 
@@ -154,7 +160,7 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                 finishMiniGame,
                 upgradeStation,
                 claimQuest,
-                claimDailyReward,
+                claimDailyReward
             }}
         >
             {children}

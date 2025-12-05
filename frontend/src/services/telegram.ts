@@ -41,16 +41,30 @@ export function initTelegram(): void {
  * Если не в Telegram – вернём null.
  */
 export function getTelegramUserId(): string | null {
-    const webApp = getWebApp()
-    if (!webApp) return null
-
-    const unsafe = webApp.initDataUnsafe
-    if (unsafe && unsafe.user && unsafe.user.id) {
-        return String(unsafe.user.id)
+    try {
+        const tg = (window as any).Telegram?.WebApp
+        const uid = tg?.initDataUnsafe?.user?.id
+        return uid ? String(uid) : null
+    } catch {
+        return null
     }
+}
 
-    // fallback: можно попытаться распарсить initData строкой, но для скелета достаточно user.id
-    return null
+// URL fallback: ?uid=123
+export function getUserIdFromUrl(): string | null {
+    if (typeof window === 'undefined') return null
+    try {
+        const params = new URLSearchParams(window.location.search)
+        const uid = params.get('uid')
+        return uid || null
+    } catch {
+        return null
+    }
+}
+
+// Local fallback for browser testing
+export function getLocalFallbackUserId(): string {
+    return 'demo-user'
 }
 
 /**

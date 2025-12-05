@@ -45,7 +45,7 @@ bot.start(async (ctx) => {
                 [
                     {
                         text: 'Open Alchemy Lab',
-                        web_app: { url: WEBAPP_URL }
+                        web_app: { url: `${WEBAPP_URL}?uid=${userId}` }
                     }
                 ]
             ],
