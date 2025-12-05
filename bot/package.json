@@ -1,0 +1,14 @@
+{
+  "name": "alchemy-lab-bot",
+  "version": "0.1.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.0",
+    "node-fetch": "^3.3.2",
+    "telegraf": "^4.16.3"
+  }
+}

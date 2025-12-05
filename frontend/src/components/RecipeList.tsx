@@ -1,32 +1,68 @@
-import React from 'react'
+﻿import React from 'react'
 import { useGameState } from '../game/state'
 import { Recipe } from '../game/types'
+import { mockIngredients } from '../game/mockData'
 
 interface Props {
-  recipes: Recipe[]
+    recipes: Recipe[]
 }
 
 export const RecipeList: React.FC<Props> = ({ recipes }) => {
-  const { player, startMiniGameForRecipe } = useGameState()
+    const { startMiniGameForRecipe, player } = useGameState()
 
-  const handleCraft = (recipeId: string) => {
-    startMiniGameForRecipe(recipeId)
-  }
+    const ingredientById = Object.fromEntries(
+        mockIngredients.map(i => [i.id, i])
+    )
 
-  return (
-    <section>
-      <h2>Recipes</h2>
-      <ul className="list">
-        {recipes.map(r => (
-          <li key={r.id} className="card">
-            <h3>{r.name}</h3>
-            <p>{r.description}</p>
-            <p>Rarity: {r.rarity}</p>
-            <p>Ingredients: {r.ingredientIds.join(', ')}</p>
-            <button onClick={() => handleCraft(r.id)}>Craft</button>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )
+    return (
+        <section>
+            <h2>Recipes</h2>
+            <ul className="list">
+                {recipes.map(recipe => {
+                    // ✅ Правильная версия — boolean 100%
+                    const isLockedByLab =
+                        recipe.requiredLabLevel !== undefined &&
+                        player.lab.tableLevel < recipe.requiredLabLevel
+
+                    return (
+                        <li key={recipe.id} className="card">
+                            <h3>
+                                {recipe.name}
+                                <span className={`badge rarity-${recipe.rarity.toLowerCase()}`}>
+                                    {recipe.rarity}
+                                </span>
+                            </h3>
+
+                            <p>{recipe.description}</p>
+
+                            {recipe.requiredLabLevel !== undefined && (
+                                <p style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+                                    Requires lab table level {recipe.requiredLabLevel}
+                                </p>
+                            )}
+
+                            <p style={{ fontSize: '0.8rem' }}>
+                                Ingredients:{' '}
+                                {recipe.ingredientIds
+                                    .map(id => ingredientById[id]?.name || id)
+                                    .join(', ')}
+                            </p>
+
+                            <p style={{ fontSize: '0.8rem' }}>
+                                Base reward: {recipe.baseRewardPoints} AP
+                            </p>
+
+                            <button
+                                disabled={isLockedByLab}
+                                onClick={() => startMiniGameForRecipe(recipe.id)}
+                            >
+                                {isLockedByLab ? 'Locked' : 'Brew'}
+                            </button>
+                        </li>
+                    )
+                })}
+            </ul>
+        </section>
+    )
 }
+
