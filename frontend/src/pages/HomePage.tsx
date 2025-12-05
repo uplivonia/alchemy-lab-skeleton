@@ -1,12 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useGameState } from '../game/state'
 
 export const HomePage: React.FC = () => {
     const { player, claimDailyReward } = useGameState()
+    const [toast, setToast] = useState<string | null>(null)
 
     const canClaimToday =
         !player.lastDailyClaim ||
         new Date(player.lastDailyClaim).toDateString() !== new Date().toDateString()
+
+    const handleDailyClick = () => {
+        if (!canClaimToday) return
+        claimDailyReward()
+        setToast('+25 AP, +10 XP')
+
+        window.setTimeout(() => {
+            setToast(null)
+        }, 2200)
+    }
 
     return (
         <section className="home">
@@ -33,7 +44,7 @@ export const HomePage: React.FC = () => {
                     <div className="home-actions">
                         <button
                             className="btn-primary"
-                            onClick={claimDailyReward}
+                            onClick={handleDailyClick}
                             disabled={!canClaimToday}
                         >
                             {canClaimToday ? 'Claim daily reward' : 'Daily reward already claimed'}
@@ -66,6 +77,12 @@ export const HomePage: React.FC = () => {
                     </p>
                 </div>
             </div>
+
+            {toast && (
+                <div className="reward-toast">
+                    <span>{toast}</span>
+                </div>
+            )}
         </section>
     )
 }
